@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recursive Conundrum index</title>
+    <title>Recursive Conundrum</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <h1>Recursive Conundrum</h1>
-    <p>A site for testing bad ideas I have and my own corner of the internet</p>
+    <p>I take issue with recursion, solely because I dont understand it.</p>
+
+    <h2>Pages: </h2>
+    <p><a href="/rwlock">Read Write Lock</a> A test on Rust read/write locks. on the admin page type in text and everyon
+        on the user page can see it.</p>
 </body>
+
 </html>
