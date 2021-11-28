@@ -1,11 +1,9 @@
-use std::sync::{RwLock, atomic::{AtomicU32, Ordering}};
+use std::{collections::HashMap, sync::{RwLock, atomic::{AtomicU32, Ordering}}};
 #[macro_use]
 extern crate rocket;
 use rocket::{State, fs::{FileServer, relative}};
 
-struct Count {
-    count: AtomicU32,
-}
+use rocket_dyn_templates::{Template};
 
 // TODO turn into a request guard of sorts
 // https://rocket.rs/v0.5-rc/guide/state/
@@ -14,21 +12,8 @@ struct Text {
 }
 
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
-
-#[get("/count")]
-fn count(hit_count: &State<Count>) -> String {
-    let current_count = hit_count.count.load(Ordering::Relaxed);
-    format!("Number of visits: {}", current_count)
-}
-
-#[get("/add")]
-fn add(hit_count: &State<Count>) -> String {
-    // let current = hit_count.count.load(Ordering::Relaxed);
-    hit_count.count.fetch_add(1, Ordering::Relaxed);
-    format!("Added 1")
+fn index() -> Template {
+    Template::render("index", &HashMap::<&str, &str>::new())
 }
 
 #[get("/string")]
@@ -43,15 +28,22 @@ fn update(new: String, text: &State<Text>) -> String {
     format!("String is: {}", &old)
 }
 
+#[get("/user")]
+fn user() -> Template {
+    Template::render("user", &HashMap::<&str, &str>::new())
+}
+
+#[get("/admin")]
+fn admin() -> Template {
+    Template::render("admin", &HashMap::<&str, &str>::new())
+}
+
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, count, add, string, update])
-        .manage(Count {
-            count: AtomicU32::new(0),
-        })
+        .mount("/", routes![index, string, update, admin, user])
+        .mount("/", FileServer::from(relative!("static")))
         .manage(Text {
             text: RwLock::new(String::new()),
-        })
-        .mount("/", FileServer::from(relative!("static")))
+        }).attach(Template::fairing())
 }
