@@ -9,14 +9,12 @@ function httpGetAsync(theUrl, callback)
     xmlHttp.send(null);
 }
 
-function get_text() {
-    text = document.getElementById("text").value
-    text = "/string/" + text
+function display_text(text) {
     console.log(text)
-    return text
+    document.getElementById("text").textContent = text
 }
 
 window.setInterval(function(){
-    httpGetAsync(get_text(), function(text){});
+    httpGetAsync("string", display_text);
     console.log("made request")
   }, 1000);
