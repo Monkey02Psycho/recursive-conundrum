@@ -7,6 +7,7 @@ use rocket::fs::{FileServer, relative};
 use rocket_dyn_templates::{Template};
 
 mod rwlock;
+mod api;
 
 #[get("/")]
 fn index() -> Template {
