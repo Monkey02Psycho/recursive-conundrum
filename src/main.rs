@@ -8,6 +8,7 @@ use rocket_dyn_templates::{Template};
 
 mod rwlock;
 mod api;
+mod mcserver;
 
 #[get("/")]
 fn index() -> Template {
@@ -19,6 +20,7 @@ fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![index])
         .mount("/rwlock/", routes![rwlock::index, rwlock::admin, rwlock::user, rwlock::update, rwlock::string])
+        .mount("/mcserver/", routes![mcserver::index])
         .mount("/", FileServer::from(relative!("static")))
         .manage(rwlock::Text::new())
         .attach(Template::fairing())
