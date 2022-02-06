@@ -128,7 +128,7 @@ pub fn solve_eq(equation: Json<Equation>) -> String {
     // "test".into()
 }
 
-#[post("/solve", format = "json", data = "<equation>")]
+#[post("/solveerror", format = "json", data = "<equation>")]
 pub fn solve_eq_error(equation: Json<Equation>) -> String {
     equation.into_inner().solve_with_error().to_string()
     // "test".into()
