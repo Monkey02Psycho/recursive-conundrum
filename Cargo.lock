@@ -1205,8 +1205,10 @@ dependencies = [
 name = "recursive-conundrum"
 version = "0.1.0"
 dependencies = [
+ "rand",
  "rocket",
  "rocket_dyn_templates",
+ "serde_json",
 ]
 
 [[package]]

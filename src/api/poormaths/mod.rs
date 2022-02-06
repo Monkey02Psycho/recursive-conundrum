@@ -4,23 +4,70 @@ use std::{
     ops::{Add, Div, Mul, Sub},
 };
 
-use rocket::serde::{Deserialize, Serialize};
+use rocket::serde::{json::Json, Deserialize, Serialize};
 
+/// Represents a mathmatical Oparation. In the future it will deseralize from
+/// +-*/ intead of the literal name
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub enum Op {
+    #[serde(rename = "+")]
     Add,
+    #[serde(rename = "-")]
     Sub,
+    #[serde(rename = "*")]
     Mul,
+    #[serde(rename = "/")]
     Div,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Deserialize)]
 #[serde(crate = "rocket::serde")]
 pub struct Equation {
     left: f64,
     op: Op,
     right: f64,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Equation;
+
+    #[test]
+    fn solve_equation() {
+        let eq: Equation = serde_json::from_str(
+            "{
+            \"left\": 3.0,
+            \"op\": \"*\",
+            \"right\": 10.0}",
+        )
+        .unwrap();
+        assert_eq!(eq.solve(), 30.0f64);
+    }
+
+    #[test]
+    fn solve_with_error() {
+        let eq: Equation = serde_json::from_str(
+            "{
+            \"left\": 3.0,
+            \"op\": \"*\",
+            \"right\": 10.0}",
+        )
+        .unwrap();
+        let result = eq.solve_with_error();
+        let lower = 30.0 - (30.0 * 0.05);
+        let upper = 30.0 + (30.0 * 0.05);
+        if (result >= lower) && (result <= upper) {
+            assert!(true)
+        }
+    }
+
+    #[test]
+    fn solve_with_error_trials() {
+        for _ in 0..255 {
+            solve_with_error()
+        }
+    }
 }
 
 impl Display for Op {
@@ -56,13 +103,33 @@ impl TryFrom<String> for Op {
 
 impl Equation {
     fn solve(&self) -> f64 {
-        match &self.op {
+        match self.op {
             Op::Add => self.left.add(self.right),
             Op::Sub => self.left.sub(self.right),
             Op::Mul => self.left.mul(self.right),
             Op::Div => self.left.div(self.right),
         }
     }
+
+    fn solve_with_error(&self) -> f64 {
+        let result = self.solve();
+        // a 5% error
+        let error = result * 0.05;
+        // should return an error within 5% of the original
+        result * rand::random::<f64>() * error
+    }
 }
 
 // https://rocket.rs/v0.5-rc/guide/requests/#json
+
+#[post("/solve", format = "json", data = "<equation>")]
+pub fn solve_eq(equation: Json<Equation>) -> String {
+    equation.into_inner().solve().to_string()
+    // "test".into()
+}
+
+#[post("/solve", format = "json", data = "<equation>")]
+pub fn solve_eq_error(equation: Json<Equation>) -> String {
+    equation.into_inner().solve_with_error().to_string()
+    // "test".into()
+}

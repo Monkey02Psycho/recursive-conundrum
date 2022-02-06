@@ -11,11 +11,7 @@
 
 <body>
     <h1>Recursive Conundrum</h1>
-    <p>I take issue with recursion, solely because I dont understand it.</p>
-
-    <h2>Pages: </h2>
-    <p><a href="/rwlock">Read Write Lock</a> A test on Rust read/write locks. on the admin page type in text and everyon
-        on the user page can see it.</p>
+    <p>A huge work in progress. expect more to come</p>
 </body>
 
 </html>

@@ -2,11 +2,10 @@
 extern crate rocket;
 use std::collections::HashMap;
 
-use rocket::fs::{FileServer, relative};
+use rocket::fs::{relative, FileServer};
 
-use rocket_dyn_templates::{Template};
+use rocket_dyn_templates::Template;
 
-mod rwlock;
 mod api;
 mod mcserver;
 
@@ -15,13 +14,17 @@ fn index() -> Template {
     Template::render("index", &HashMap::<&str, &str>::new())
 }
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
+// The same idea as using tokio::main I think
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    let rocket = rocket::build()
         .mount("/", routes![index])
-        .mount("/rwlock/", routes![rwlock::index, rwlock::admin, rwlock::user, rwlock::update, rwlock::string])
         .mount("/mcserver/", routes![mcserver::index])
         .mount("/", FileServer::from(relative!("static")))
-        .manage(rwlock::Text::new())
+        .mount("/api", routes![api::poormaths::solve_eq, api::poormaths::solve_eq_error])
         .attach(Template::fairing())
+        .ignite()
+        .await?;
+    rocket.launch().await?;
+    Ok(())
 }
