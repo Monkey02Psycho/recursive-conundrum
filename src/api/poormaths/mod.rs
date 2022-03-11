@@ -49,16 +49,20 @@ mod tests {
     fn solve_with_error() {
         let eq: Equation = serde_json::from_str(
             "{
-            \"left\": 3.0,
+            \"left\": 40,
             \"op\": \"*\",
-            \"right\": 10.0}",
+            \"right\": 10}",
         )
         .unwrap();
         let result = eq.solve_with_error();
-        let lower = 30.0 - (30.0 * 0.05);
-        let upper = 30.0 + (30.0 * 0.05);
+        let lower = 400.0 - (400.0 * 0.05);
+        let upper = 400.0 + (400.0 * 0.05);
         if (result >= lower) && (result <= upper) {
-            assert!(true)
+            // println!("{}", result);
+            assert!(true);
+        } else {
+            // println!("{}", result);
+            assert!(false);
         }
     }
 
@@ -112,11 +116,18 @@ impl Equation {
     }
 
     fn solve_with_error(&self) -> f64 {
-        let result = self.solve();
+        let arm = self.solve();
+        let mut result = self.solve();
+        // println!("{}", result);
         // a 5% error
-        let error = result * 0.05;
+        let error = arm * 0.05;
         // should return an error within 5% of the original
-        result * rand::random::<f64>() * error
+        match rand::random::<bool>(){
+            true => result += rand::random::<f64>() * error,
+            false => result -= rand::random::<f64>() * error,
+        }
+        // println!("{}", result);
+        result
     }
 }
 
