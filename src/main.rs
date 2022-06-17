@@ -8,6 +8,7 @@ use rocket_dyn_templates::Template;
 
 mod api;
 mod mcserver;
+mod downloads;
 
 #[get("/")]
 fn index() -> Template {
@@ -22,6 +23,7 @@ async fn main() -> Result<(), rocket::Error> {
         .mount("/mcserver/", routes![mcserver::index])
         .mount("/", FileServer::from(relative!("static")))
         .mount("/api", routes![api::poormaths::solve_eq, api::poormaths::solve_eq_error])
+        .mount("/downloads", routes![downloads::downloads])
         .attach(Template::fairing())
         .manage(RwLock::new(api::game::Games::default()))
         .ignite()
