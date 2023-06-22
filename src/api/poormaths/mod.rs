@@ -62,7 +62,7 @@ mod tests {
             assert!(true);
         } else {
             // println!("{}", result);
-            assert!(false);
+            panic!("Result is not within the bounds. result is: {:?}", result);
         }
     }
 

@@ -5,7 +5,7 @@ use std::{collections::HashMap};
 use rocket::fs::{relative, FileServer};
 use rocket::{tokio::sync::RwLock};
 use rocket_dyn_templates::Template;
-
+use guess_game::*;
 mod api;
 mod mcserver;
 mod downloads;
@@ -25,7 +25,7 @@ async fn main() -> Result<(), rocket::Error> {
         .mount("/api", routes![api::poormaths::solve_eq, api::poormaths::solve_eq_error])
         .mount("/downloads", routes![downloads::downloads])
         .attach(Template::fairing())
-        .manage(RwLock::new(api::game::Games::default()))
+        .manage(RwLock::new(Games::default()))
         .ignite()
         .await?;
     rocket.launch().await?;
