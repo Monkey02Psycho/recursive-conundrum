@@ -1,33 +1,34 @@
-#[macro_use]
-extern crate rocket;
-use std::{collections::HashMap};
 
-use rocket::fs::{relative, FileServer};
-use rocket::{tokio::sync::RwLock};
-use rocket_dyn_templates::Template;
-use guess_game::*;
-mod api;
-mod mcserver;
-mod downloads;
+use axum::{
+    routing::{get, post},
+    http::StatusCode,
+    response::IntoResponse,
+    Json, Router,
+};
+use serde::{Deserialize, Serialize};
+use std::net::SocketAddr;
 
-#[get("/")]
-fn index() -> Template {
-    Template::render("index", &HashMap::<&str, &str>::new())
+#[tokio::main]
+async fn main() {
+    // initialize tracing
+    tracing_subscriber::fmt::init();
+
+    // build our application with a route
+    let app = Router::new()
+        // `GET /` goes to `root`
+        .route("/", get(root));
+
+    // run our app with hyper
+    // `axum::Server` is a re-export of `hyper::Server`
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    tracing::debug!("listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
-// The same idea as using tokio::main I think
-#[rocket::main]
-async fn main() -> Result<(), rocket::Error> {
-    let rocket = rocket::build()
-        .mount("/", routes![index])
-        .mount("/mcserver/", routes![mcserver::index])
-        .mount("/", FileServer::from(relative!("static")))
-        .mount("/api", routes![api::poormaths::solve_eq, api::poormaths::solve_eq_error])
-        .mount("/downloads", routes![downloads::downloads])
-        .attach(Template::fairing())
-        .manage(RwLock::new(Games::default()))
-        .ignite()
-        .await?;
-    rocket.launch().await?;
-    Ok(())
+// basic handler that responds with a static string
+async fn root() -> &'static str {
+    "Hello, World!"
 }
